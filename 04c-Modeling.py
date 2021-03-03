@@ -693,7 +693,7 @@ if __name__ == '__main__' :
     
     
     
-    randSeed = 210
+    randSeed = 2*3*5*7
     listIndices = [(dfTrain,dfTest) for dfTrain,dfTest 
                    in KFold(n_splits=10,shuffle=True).split(dfSubset)]
     
@@ -920,7 +920,7 @@ if __name__ == '__main__' :
     #   Make param list
     listPercent = [2/len(dfSubset),0.01,0.05,0.1]
     listSampleM = [round(x*len(dfSubset)) for x in listPercent]
-    listParam = list(product(range(2,6),listSampleM))
+    listParam = list(product(range(2,4),listSampleM))
     print('\nStart Trees code')
     strLog = strLog+'\nStart Trees code\n'
     dictTextTrees = {}
@@ -1033,9 +1033,11 @@ if __name__ == '__main__' :
                 for fold in listIndices :
                     
                     #   Fit model on train sets
-                    treeClass = tree.DecisionTreeClassifier(max_depth=param[0],min_samples_split=param[1],
-                                                   ).fit(take(dfSubset[listIV],fold[0],axis=0),
-                                                          take(dfSubset[dv],fold[0],axis=0))
+                    treeClass = tree.DecisionTreeClassifier(max_depth=param[0],
+                                                            min_samples_split=param[1],
+                                                            random_state=randSeed
+                                                            ).fit(take(dfSubset[listIV],fold[0],axis=0),
+                                                                  take(dfSubset[dv],fold[0],axis=0))
                     
                     #   Calculate error on test set. Save to list
                     y_pred = treeClass.predict(take(dfSubset[listIV],fold[1],axis=0))
@@ -1075,9 +1077,10 @@ if __name__ == '__main__' :
             
             strTextTrees =  (strTextTrees+dv+' : '+dictDVDict[dv]+'\n'+
                              'Class. Tree: '+
-                             'Max depth = '+str(bestParam[0])+
+                             'Max Depth = '+str(bestParam[0])+
                              ' , Min Sample Split = '+str(bestParam[1])+'\n'+
-                             export_text(bestTreeClass,feature_names=listIV)+'\n'
+                             export_text(bestTreeClass,feature_names=listIV)+
+                             'Class. Accuracy = '+str(round(score,5))+'\n\n'
                             )
                             
             dictTextTrees[dv] = export_text(bestTreeClass,feature_names=listIV)
@@ -1105,7 +1108,8 @@ if __name__ == '__main__' :
                 for fold in listIndices :
                     
                     #   Fit model on train sets
-                    forestClass = RandomForestClassifier(max_depth=param[0],min_samples_split=param[1]
+                    forestClass = RandomForestClassifier(max_depth=param[0],min_samples_split=param[1],
+                                                         random_state=randSeed
                                                        ).fit(take(dfSubset[listIV],fold[0],axis=0),
                                                              take(dfSubset[dv],fold[0],axis=0))
                     
@@ -1123,7 +1127,7 @@ if __name__ == '__main__' :
             bestParam = max(dictMSE,key=dictMSE.get)
             bestMSE = dictMSE[max(dictMSE,key=dictMSE.get)]
             
-            bestForestClass = RandomForestClassifier(max_depth=bestParam[0],min_samples_split=bestParam[1]
+            bestForestClass = RandomForestClassifier(max_depth=bestParam[0],min_samples_split=bestParam[1],random_state=randSeed
                                            ).fit(dfSubset[listIV],dfSubset[dv])
             score = bestForestClass.score(dfSubset[listIV],dfSubset[dv])
             adjR2 = 1-(((1-score)*(len(dfSubset)-1))/(len(dfSubset)-len(listIV)-1))
@@ -1173,7 +1177,7 @@ if __name__ == '__main__' :
                 for fold in listIndices :
                     
                     #   Fit model on train sets
-                    treeReg = tree.DecisionTreeRegressor(max_depth=param[0],min_samples_split=param[1],
+                    treeReg = tree.DecisionTreeRegressor(max_depth=param[0],min_samples_split=param[1],random_state=randSeed
                                                          ).fit(take(dfSubset[listIV],fold[0],axis=0),
                                                                take(dfSubset[dv],fold[0],axis=0))
                     
@@ -1191,7 +1195,7 @@ if __name__ == '__main__' :
             bestParam = min(dictMSE,key=dictMSE.get)
             bestMSE = dictMSE[min(dictMSE,key=dictMSE.get)]
             
-            bestTreeReg = tree.DecisionTreeRegressor(max_depth=bestParam[0],min_samples_split=bestParam[1]
+            bestTreeReg = tree.DecisionTreeRegressor(max_depth=bestParam[0],min_samples_split=bestParam[1],random_state=randSeed
                                                      ).fit(dfSubset[listIV],dfSubset[dv])
             score = bestTreeReg.score(dfSubset[listIV],dfSubset[dv])
             adjR2 = 1-(((1-score)*(len(dfSubset)-1))/(len(dfSubset)-len(listIV)-1))
@@ -1215,7 +1219,8 @@ if __name__ == '__main__' :
                              'Reg. Tree: '+
                              'Max depth = '+str(bestParam[0])+
                              ' , Min Sample Split = '+str(bestParam[1])+'\n'+
-                             export_text(bestTreeReg,feature_names=listIV)+'\n'
+                             export_text(bestTreeReg,feature_names=listIV)+
+                             'R^2 = '+str(round(score,5))+'\n\n'
                              )
             
             dictTextTrees[dv] = export_text(bestTreeReg,feature_names=listIV)
@@ -1247,7 +1252,7 @@ if __name__ == '__main__' :
                 for fold in listIndices :
                     
                     #   Fit model on train sets
-                    forestReg = RandomForestRegressor(max_depth=param[0],min_samples_split=param[1]
+                    forestReg = RandomForestRegressor(max_depth=param[0],min_samples_split=param[1],random_state=randSeed
                                                        ).fit(take(dfSubset[listIV],fold[0],axis=0),
                                                              take(dfSubset[dv],fold[0],axis=0))
                     
@@ -1265,7 +1270,7 @@ if __name__ == '__main__' :
             bestParam = min(dictMSE,key=dictMSE.get)
             bestMSE = dictMSE[min(dictMSE,key=dictMSE.get)]
             
-            bestForestReg = RandomForestRegressor(max_depth=bestParam[0],min_samples_split=bestParam[1]
+            bestForestReg = RandomForestRegressor(max_depth=bestParam[0],min_samples_split=bestParam[1],random_state=randSeed
                                            ).fit(dfSubset[listIV],dfSubset[dv])
             score = bestForestReg.score(dfSubset[listIV],dfSubset[dv])
             adjR2 = 1-(((1-score)*(len(dfSubset)-1))/(len(dfSubset)-len(listIV)-1))

@@ -289,7 +289,7 @@ if __name__ == '__main__' :
     dfStem = merge_track(dfStem,shapeMap,['state','county'],'left')[0]
     
     #   Add Label Point
-    dfStem['point'] = dfStem['geometry'].apply(lambda x : x.representative_point().coords[:])
+    dfStem['point'] = dfStem['geometry'].apply(lambda x : x.centroid.coords[:])
     listPoints = [Point(coords[0]) for coords in dfStem['point']]
     dfStem = dfStem[['year','month','state','county','Production','bProduction']]
     dfStem = GeoDataFrame(dfStem,geometry=listPoints)

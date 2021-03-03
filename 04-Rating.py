@@ -29,16 +29,21 @@ from shapely.geometry import Point,LineString,shape
 from matplotlib.colors import LinearSegmentedColormap
 
 
-# 5A : bNuance==1 & (bForceGroup==1)&(bSigmaGroup==0)
+# Ratings tuning params
+# 5A : bNuance==1 & (bForceGroup==1)&(bSigmaGroup==0) # Our final choice
 # 5B : bNuance==1 & (bForceGroup==0)&(bSigmaGroup==1)
 bNuance     = 1
 bMean       = 1                 # Take sum/mean of storm scores
 bForceGroup = 0                 # Apply percentiles to unrounded ratings
 bSigmaGroup = 1                 # Apply sigma groups
+
+# Storm discounting function params
 radiusEye   = 30                # Radius of eye, even map no discount      
 radiusStorm = 100               # Radius of storm, from center out
 radiusDecay = 1.0               # Rate of decay from storm center factor^(radiusDecay)
                                 # 1 = linear, >1 = polynomial decay, (0,1) = radical decay
+
+# Texas elevation params
 bTexasElevation = 1             # 0 = full Texas, 1 = limited Texas
 iTexasElevation = 900.5         # Cut-off for Texas counties by elevation
                                 
@@ -560,8 +565,6 @@ def storm_decay (x,eye,radius,rate) :
     elif (x[1]>eye)&(x[1]<radius)  : 
         score = x[0]*((radius-x[1])/(radius-eye))**(rate)
     
-    
-    
     # lambda x : x[0]*((radiusStorm-x[1])/radiusStorm) if x[1]<=radiusStorm
     # else None,axis=1)
     
@@ -738,7 +741,7 @@ if __name__ =='__main__' :
     print('Coastal Map, No  scoreStorm = '+str(dfData['scoreStorm'][dfData['bCoastal']==1].isna().sum()))
     
     
-    dfData['center'] = dfData['geometry'].apply(lambda x : x.representative_point().coords[:])
+    dfData['center'] = dfData['geometry'].apply(lambda x : x.centroid.coords[:])
     listPoints = [Point(coords[0]) for coords in dfData['center']]
     dfData = dfData.rename(columns={'geometry':'outline'})
     dfData = GeoDataFrame(dfData,geometry=listPoints)
@@ -856,6 +859,9 @@ if __name__ =='__main__' :
     keys = list(dictWeights.keys())
     values = list(dictWeights.values())
     
+    #   In our final ratings system bNuance==1 & dictWeights should only include
+    #   scoreEcon, scoreRecovery and scoreInsurance. Iterating through listTupPerc
+    #   is only used for mapping single vars later on.
     if bNuance==0 :
         for tpl in listTupPerc :
             dfRatings[tpl[0]] = percentile_rating(dfData[['bCoastal',tpl[0]]],tpl[0],
