@@ -5,6 +5,7 @@ Created on Mon Nov  9 22:15:24 2020
 
 Input files:        data/census FIPS Codes.txt,
                     data/ZIP-COUNTY-FIPS_2018-03.csv,
+                    data/census State Codes.txt
 Preceeding Script:  none
 Output files:       data/censusMaster.csv
 Following Script:   any that use censusMaster dictionary

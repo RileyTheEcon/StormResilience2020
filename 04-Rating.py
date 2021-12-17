@@ -30,7 +30,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 
 # Ratings tuning params
-# 5A : bNuance==1 & (bForceGroup==1)&(bSigmaGroup==0) # Our final choice
+# 5A : bNuance==1 & (bForceGroup==1)&(bSigmaGroup==0) # 
 # 5B : bNuance==1 & (bForceGroup==0)&(bSigmaGroup==1)
 bNuance     = 1
 bMean       = 1                 # Take sum/mean of storm scores
@@ -949,9 +949,9 @@ if __name__ =='__main__' :
             dfMean = 0
             dfStdv = 1
         
-        # dfRatings['rating-round'] = dfRatings['Rating'].apply(
-        #     lambda x : (x - dfMean)/dfStdv)
-        # dfRatings['rating-round'] = dfRatings['rating-round'].apply(sigma_groups,args=(listSigmas,))
+        dfRatings['rating-round'] = dfRatings['Rating'].apply(
+            lambda x : (x - dfMean)/dfStdv)
+        dfRatings['rating-round'] = dfRatings['rating-round'].apply(sigma_groups,args=(listSigmas,))
         dfRatings['rating-round'] = dfRatings['Rating'].apply(sigma_groups,args=(listSigmas,))
         
         # for var in [x[0] for x in listTupPerc]:
@@ -982,9 +982,17 @@ if __name__ =='__main__' :
         #   end for
         print(dfRatings['rating-round'][dfRatings['bCoastal']==1].value_counts().sort_index())
         dfFreq.to_csv('data/rating-freq.csv',index=None)
-        dfData.to_csv('data/rating-data.csv',index=None)
-        dfRatings.to_csv('data/rating.csv',index=None)
     #   end if
+    
+    
+    
+    
+    dfData.to_csv('data/rating-data.csv',index=None)
+    # dfRatings.to_csv('data/rating.csv',index=None)
+    dfRatings.loc[:,dfRatings.columns!='outline'
+                  ].to_csv('data/rating_2.csv',index=None)
+    
+    
     
     dfGraph = GeoDataFrame(dfRatings[['abrState','county','bCoastal',
                                       'Rating','rating-round']
